@@ -1,0 +1,52 @@
+#include <iostream>
+#include <cstdlib> 
+using namespace std;
+
+int main() {
+    int numberOfParticipants;
+ 
+    cout << "Enter the total number of participants: ";
+    cin >> numberOfParticipants;
+
+    int *attendance = (int*)calloc(numberOfParticipants, sizeof(int));
+
+    if (attendance == NULL) { 
+        cout << "Error: Unable to allocate memory. Program will exit." << endl;
+        return 1;
+    }
+    
+    cout << endl;
+    cout << "Attendance list initialized. All participants are marked absent initially." << endl << endl;
+    
+    cout << "-----------------------------" << endl;
+    for(int i = 0; i < numberOfParticipants; i++) {
+        cout << "Mark attendance for Participant " << (i + 1) << " (1 for Present, 0 for Absent): ";
+        cin >> attendance[i];
+        
+        if(attendance[i] != 1 && attendance[i] != 0) {
+            cout << "Invalid input! Please enter 1 (Present) or 0 (Absent)." << endl;
+            cout << "Try again for Participant " << (i + 1) << ": ";
+            cin >> attendance[i];
+        }
+    }
+
+    cout << endl;
+    cout << "Attendance Summary (1 = Present, 0 = Absent):" << endl << endl;
+    
+    cout << "-----------------------------" << endl;
+    for (int i = 0; i < numberOfParticipants; i++) {
+        cout << "Participant " << (i + 1) << " : ";
+        if (attendance[i] == 1) {
+            cout << "Present" << endl;
+        } else {
+            cout << "Absent" << endl;
+        }
+    }
+    cout << "-----------------------------" << endl;
+
+    free(attendance);
+    
+    cout << endl;
+    cout << "Attendance recording complete. Thank you!" << endl;
+    return 0;
+}
