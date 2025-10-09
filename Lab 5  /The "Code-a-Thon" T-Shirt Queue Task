@@ -1,0 +1,170 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Node structure for each student
+class Node {
+public:
+    string name;
+    int id;
+    Node* next;
+
+    Node(string n, int i) {
+        name = n;
+        id = i;
+        next = nullptr;
+    }
+};
+
+// Queue class to manage operations
+class Queue {
+private:
+    Node* front;
+    Node* rear;
+    int count;
+
+public:
+    Queue() {
+        front = rear = nullptr;
+        count = 0;
+    }
+
+    // 1. Add student to the end of queue
+    void addStudent(string name, int id) {
+        Node* newNode = new Node(name, id);
+
+        if (rear == nullptr) { // first student
+            front = rear = newNode;
+        } else {
+            rear->next = newNode;
+            rear = newNode;
+        }
+
+        count++;
+        cout << name << " (ID: " << id << ") joined the queue.\n";
+    }
+
+    // 2. Serve the first student
+    void serveStudent() {
+        if (front == nullptr) {
+            cout << "No students in the queue.\n";
+            return;
+        }
+
+        Node* temp = front;
+        cout << temp->name << " (ID: " << temp->id << ") received the T-shirt and left the queue.\n";
+
+        front = front->next;
+        if (front == nullptr)
+            rear = nullptr;
+
+        delete temp;
+        count--;
+    }
+
+    // 3. Remove a specific student by ID
+    void studentLeaves(int id) {
+        if (front == nullptr) {
+            cout << "Queue is empty.\n";
+            return;
+        }
+
+        Node* temp = front;
+        Node* prev = nullptr;
+
+        while (temp != nullptr && temp->id != id) {
+            prev = temp;
+            temp = temp->next;
+        }
+
+        if (temp == nullptr) {
+            cout << "Student with ID " << id << " not found in queue.\n";
+            return;
+        }
+
+        if (temp == front) { // first student leaving
+            front = front->next;
+        } else {
+            prev->next = temp->next;
+        }
+
+        if (temp == rear) {
+            rear = prev;
+        }
+
+        cout << temp->name << " (ID: " << temp->id << ") left the queue early.\n";
+        delete temp;
+        count--;
+    }
+
+    // 4. Display all students in queue
+    void displayQueue() {
+        if (front == nullptr) {
+            cout << "Queue is empty.\n";
+            return;
+        }
+
+        Node* temp = front;
+        cout << "\nCurrent Queue (Front → Back):\n";
+        while (temp != nullptr) {
+            cout << "Name: " << temp->name << " | ID: " << temp->id << endl;
+            temp = temp->next;
+        }
+    }
+
+    // 5. Show total number of students
+    void countStudents() {
+        cout << "Total students waiting: " << count << endl;
+    }
+};
+
+// Main function with menu
+int main() {
+    Queue q;
+    int choice, id;
+    string name;
+
+    do {
+        cout << "\n--- Code-a-Thon Queue Management ---\n";
+        cout << "1. Add Student\n";
+        cout << "2. Serve Student\n";
+        cout << "3. Student Leaves (by ID)\n";
+        cout << "4. Display Queue\n";
+        cout << "5. Count Students\n";
+        cout << "0. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter Student Name: ";
+            cin.ignore();
+            getline(cin, name);
+            cout << "Enter Student ID: ";
+            cin >> id;
+            q.addStudent(name, id);
+            break;
+        case 2:
+            q.serveStudent();
+            break;
+        case 3:
+            cout << "Enter Student ID to remove: ";
+            cin >> id;
+            q.studentLeaves(id);
+            break;
+        case 4:
+            q.displayQueue();
+            break;
+        case 5:
+            q.countStudents();
+            break;
+        case 0:
+            cout << "Exiting program. Goodbye!\n";
+            break;
+        default:
+            cout << "Invalid choice. Try again.\n";
+        }
+    } while (choice != 0);
+
+    return 0;
+}
