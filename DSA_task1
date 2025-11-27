@@ -1,0 +1,128 @@
+#include <iostream>
+using namespace std;
+
+class Queue {
+private:
+    int* arr;
+    int capacity;
+    int frontidx;
+    int rearidx;
+    int currentsize;
+
+    void resize() {
+        int newCapacity = capacity * 2;
+        int* newArr = new int[newCapacity];
+
+      
+        for (int i = 0; i < currentsize; i++) {
+            newArr[i] = arr[(frontidx + i) % capacity];
+        }
+
+        // Delete old array
+        delete[] arr;
+
+        // Update pointers
+        arr = newArr;
+        capacity = newCapacity;
+        frontidx = 0;
+        rearidx = currentsize - 1;
+    }
+
+public:
+
+    Queue(int size = 4) {
+        capacity = size;
+        frontidx = 0;
+        rearidx = -1;
+        currentsize = 0;
+        arr = new int[capacity];   
+    }
+
+    ~Queue() {
+        delete[] arr;
+    }
+
+    bool Isempty() const {
+        return currentsize == 0;
+    }
+
+    int size() const {
+        return currentsize;
+    }
+
+    void enqueue(int value) {
+        if (currentsize == capacity) {
+            resize();
+        }
+        rearidx = (rearidx + 1) % capacity;   
+        arr[rearidx] = value;
+        currentsize++;
+    }
+
+    int dequeue() {
+        if (Isempty()) {
+            cout << "Queue Underflow!" << endl;
+            return -1;
+        }
+
+        int val = arr[frontidx];
+        frontidx = (frontidx + 1) % capacity;
+        currentsize--;
+        return val;
+    }
+
+    int front() const {
+        if (Isempty()) {
+            cout << "Queue is empty! No front element" << endl;
+            return -1;
+        }
+        return arr[frontidx];
+    }
+
+    void print() const {
+        cout << "Queue Elements: ";
+        for (int i = 0; i < currentsize; i++) {
+            int index = (frontidx + i) % capacity;
+            cout << arr[index] << " ";
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    Queue q;
+    cout << "Enqueue 10, 20, 30, 40" << endl;
+
+    q.enqueue(10);
+    q.enqueue(20);
+    q.enqueue(30);
+    q.enqueue(40);
+
+    q.print();
+
+    cout << "Front element: " << q.front() << endl;
+
+    cout << "Dequeue two elements" << endl;
+    q.dequeue();
+    q.dequeue();
+
+    q.print();
+
+    cout << "Front element: " << q.front() << endl;
+    
+    cout<<"Enqueue 50,60, 70(this will cause resize internally)"<<endl;
+    q.enqueue(50);
+    q.enqueue(60);
+    q.enqueue(70);
+    q.print();
+    
+    cout<<"Dequeuing all element"<<endl;
+    while(!q.Isempty()){
+    	cout<<"Front: "<<q.front()<<"->dequeued"<<endl;
+    	q.dequeue();
+	}
+    q.dequeue();
+    return 0;
+    
+    
+}
