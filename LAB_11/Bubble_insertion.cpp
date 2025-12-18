@@ -1,163 +1,523 @@
-
 #include <iostream>
 #include <fstream>
-#include <string>
-#include <cstdlib>
-#include <ctime>
+#include <cstring>
 #include <iomanip>
+
 using namespace std;
 
-// Arrays for generating realistic Muslim names
-string firstNamesMale[] = {
-    "Muhammad", "Ahmed", "Ali", "Omar", "Hassan", "Hussein", "Yousuf", "Ibrahim",
-    "Ismail", "Khalid", "Bilal", "Usman", "Hamza", "Tariq", "Saad", "Zain",
-    "Faisal", "Junaid", "Imran", "Kamran", "Adnan", "Arslan", "Asad", "Fahad",
-    "Haris", "Salman", "Tahir", "Waleed", "Yasir", "Zubair", "Aamir", "Shahid",
-    "Farhan", "Rizwan", "Nadeem", "Rashid", "Sami", "Talha", "Umar", "Waqar",
-    "Abdullah", "Abdul Rahman", "Abdul Aziz", "Azhar", "Haider", "Haseeb", "Jawad", "Karim",
-    "Luqman", "Majid", "Naveed", "Omer", "Qasim", "Raza", "Saqib", "Shayan",
-    "Taha", "Usama", "Yahya", "Zakariya", "Amjad", "Aslam", "Bashir", "Danish",
-    "Ehsan", "Furqan", "Ghulam", "Irfan", "Jamil", "Kashif", "Latif", "Mubarak",
-    "Nasir", "Osama", "Pervez", "Qadir", "Rafiq", "Shahzad", "Tanvir", "Wasim"
+struct Stu {
+    int id;
+    char name[100];
+    char dept[4];
+    int sem;
+    float gpa;
+    int cred;
+    int yr;
+    Stu* nxt;
 };
 
-string firstNamesFemale[] = {
-    "Fatima", "Aisha", "Maryam", "Zainab", "Khadija", "Hafsa", "Ruqayyah", "Sana",
-    "Sara", "Hira", "Amina", "Noor", "Huda", "Layla", "Mariam", "Zara",
-    "Ayesha", "Bushra", "Farah", "Hana", "Iqra", "Javeria", "Kanza", "Lubna",
-    "Mahnoor", "Nimra", "Rabia", "Sadia", "Tayyaba", "Warda", "Zahra", "Aliza",
-    "Arooj", "Esha", "Farida", "Haleema", "Ifra", "Kinza", "Madiha", "Nida",
-    "Qurat", "Rida", "Saima", "Tooba", "Uzma", "Yumna", "Zoya", "Anam",
-    "Fizza", "Hajra", "Kubra", "Mehreen", "Nazia", "Rafia", "Samina", "Shazia",
-    "Sehrish", "Sidra", "Anum", "Areeba", "Faiza", "Huma", "Iram", "Maha",
-    "Naila", "Rema", "Sabeen", "Sehar", "Ayat", "Dua", "Emaan", "Fariha",
-    "Ghazala", "Hiba", "Insha", "Mahira", "Nayab", "Rani", "Sumaya", "Tania"
-};
+Stu* first = nullptr;
+int total = 0;
 
-string lastNames[] = {
-    "Khan", "Ahmed", "Ali", "Hassan", "Shah", "Malik", "Hussain", "Mahmood",
-    "Rahman", "Siddiqui", "Akhtar", "Aziz", "Baig", "Chaudhry", "Dar", "Farooq",
-    "Haider", "Iqbal", "Javed", "Karim", "Mirza", "Naqvi", "Qureshi", "Raza",
-    "Saeed", "Tariq", "Usman", "Yousuf", "Zaidi", "Abbasi", "Butt", "Cheema",
-    "Durrani", "Gillani", "Hashmi", "Jamil", "Kazmi", "Leghari", "Mughal", "Niazi",
-    "Pasha", "Quershi", "Rizvi", "Shafi", "Tahir", "Waheed", "Zia", "Ansari",
-    "Bhatti", "Farooqui", "Haq", "Ilyas", "Khalil", "Latif", "Masood", "Nadeem",
-    "Qadir", "Rasheed", "Saleem", "Tahir", "Wali", "Zaman", "Afridi", "Baloch",
-    "Ghazi", "Hafeez", "Imam", "Junaid", "Kamal", "Lodhi", "Mufti", "Nasir",
-    "Osmani", "Pirzada", "Rana", "Sultan", "Tanveer", "Usmani", "Warraich", "Yasin",
-    "Akram", "Bashir", "Daud", "Fahim", "Ghani", "Hameed", "Ismail", "Kamran",
-    "Majeed", "Naveed", "Rafiq", "Sadiq", "Shakeel", "Wahab", "Yaqoob", "Zaheer",
-    "Anwar", "Farhan", "Hamza", "Irfan", "Kareem", "Manzoor", "Naseer", "Pervez",
-    "Ramzan", "Shafiq", "Tirmizi", "Uzair", "Waqar", "Younas", "Zahid", "Aslam"
-};
-
-string departments[] = { "CSE", "EEE", "MEC", "CIV", "ARC", "CHE", "BBA", "ECO", "PHY", "MAT" };
-
-// Function to generate random CGPA with realistic distribution
-double generateCGPA() {
-    int rand_val = rand() % 100;
-    if (rand_val < 5) return 2.00 + (rand() % 50) / 100.0;  // 5% below 2.50
-    else if (rand_val < 20) return 2.50 + (rand() % 50) / 100.0;  // 15% between 2.50-3.00
-    else if (rand_val < 50) return 3.00 + (rand() % 30) / 100.0;  // 30% between 3.00-3.30
-    else if (rand_val < 80) return 3.30 + (rand() % 40) / 100.0;  // 30% between 3.30-3.70
-    else return 3.70 + (rand() % 30) / 100.0;  // 20% between 3.70-4.00
+void load() {
+    ifstream in("students_data.txt");
+    if (!in) {
+        cout << "Cant open\n";
+        return;
+    }
+    
+    in >> total;
+    Stu* lastone = nullptr;
+    
+    for (int i = 0; i < total; i++) {
+        Stu* n = new Stu;
+        in >> n->id;
+        in.ignore();
+        in.getline(n->name, 100);
+        in >> n->dept >> n->sem >> n->gpa >> n->cred >> n->yr;
+        n->nxt = nullptr;
+        
+        if (!first) first = n;
+        else lastone->nxt = n;
+        lastone = n;
+    }
+    in.close();
 }
 
-// Function to generate credit hours based on semester
-int generateCreditHours(int semester) {
-    int baseCredits = semester * 18;  // Assuming ~18 credits per semester
-    int variation = rand() % 21 - 10;  // Random variation of -10 to +10
-    int credits = baseCredits + variation;
-    if (credits < 15) credits = 15;  // Minimum credits
-    if (credits > 195) credits = 195;  // Maximum for 8th semester
-    return credits;
+void swapStu(Stu* a, Stu* b) {
+    Stu t = *a;
+    a->id = b->id;
+    strcpy(a->name, b->name);
+    strcpy(a->dept, b->dept);
+    a->sem = b->sem;
+    a->gpa = b->gpa;
+    a->cred = b->cred;
+    a->yr = b->yr;
+    
+    b->id = t.id;
+    strcpy(b->name, t.name);
+    strcpy(b->dept, t.dept);
+    b->sem = t.sem;
+    b->gpa = t.gpa;
+    b->cred = t.cred;
+    b->yr = t.yr;
+}
+
+void selectionSortCGPA() {
+    Stu* curr = first;
+    while (curr) {
+        Stu* maxNode = curr;
+        Stu* temp = curr->nxt;
+        while (temp) {
+            if (temp->gpa > maxNode->gpa || 
+               (temp->gpa == maxNode->gpa && temp->cred > maxNode->cred)) {
+                maxNode = temp;
+            }
+            temp = temp->nxt;
+        }
+        if (maxNode != curr) {
+            swapStu(curr, maxNode);
+        }
+        curr = curr->nxt;
+    }
+}
+
+void selectionSortYear() {
+    Stu* curr = first;
+    while (curr) {
+        Stu* minNode = curr;
+        Stu* temp = curr->nxt;
+        while (temp) {
+            if (temp->yr < minNode->yr || 
+               (temp->yr == minNode->yr && temp->id < minNode->id)) {
+                minNode = temp;
+            }
+            temp = temp->nxt;
+        }
+        if (minNode != curr) {
+            swapStu(curr, minNode);
+        }
+        curr = curr->nxt;
+    }
+}
+
+void selectionSortDept() {
+    Stu* curr = first;
+    while (curr) {
+        Stu* best = curr;
+        Stu* temp = curr->nxt;
+        while (temp) {
+            if (strcmp(temp->dept, best->dept) < 0 ||
+               (strcmp(temp->dept, best->dept) == 0 && temp->sem < best->sem) ||
+               (strcmp(temp->dept, best->dept) == 0 && temp->sem == best->sem && temp->gpa > best->gpa)) {
+                best = temp;
+            }
+            temp = temp->nxt;
+        }
+        if (best != curr) {
+            swapStu(curr, best);
+        }
+        curr = curr->nxt;
+    }
+}
+
+void makeFile1() {
+    Stu* copyHead = nullptr;
+    Stu* copyLast = nullptr;
+    Stu* orig = first;
+    
+    while (orig) {
+        Stu* n = new Stu;
+        *n = *orig;
+        n->nxt = nullptr;
+        
+        if (!copyHead) copyHead = n;
+        else copyLast->nxt = n;
+        copyLast = n;
+        orig = orig->nxt;
+    }
+    
+    Stu* curr = copyHead;
+    while (curr) {
+        Stu* maxN = curr;
+        Stu* temp = curr->nxt;
+        while (temp) {
+            if (temp->gpa > maxN->gpa || 
+               (temp->gpa == maxN->gpa && temp->cred > maxN->cred)) {
+                maxN = temp;
+            }
+            temp = temp->nxt;
+        }
+        if (maxN != curr) {
+            swapStu(curr, maxN);
+        }
+        curr = curr->nxt;
+    }
+    
+    ofstream out("ranked_by_cgpa.txt");
+    
+    out << "====================================================\n";
+    out << "        STUDENTS RANKED BY CGPA\n";
+    out << "====================================================\n";
+    out << "Rank | ID     | Name              | Dept | Sem | CGPA | Credits | Year\n";
+    out << "-----|--------|-------------------|------|-----|------|---------|------\n";
+    
+    int r = 1;
+    curr = copyHead;
+    while (curr) {
+        out << setw(3) << r++ << "  | " << curr->id << " | "
+            << left << setw(17) << curr->name << " | "
+            << setw(4) << curr->dept << " | "
+            << setw(3) << curr->sem << " | "
+            << fixed << setprecision(2) << curr->gpa << " | "
+            << setw(7) << curr->cred << " | "
+            << curr->yr << endl;
+        curr = curr->nxt;
+    }
+    
+    Stu* t;
+    while (copyHead) {
+        t = copyHead;
+        copyHead = copyHead->nxt;
+        delete t;
+    }
+    out.close();
+}
+
+void makeFile2() {
+    Stu* copyHead = nullptr;
+    Stu* copyLast = nullptr;
+    Stu* orig = first;
+    
+    while (orig) {
+        Stu* n = new Stu;
+        *n = *orig;
+        n->nxt = nullptr;
+        
+        if (!copyHead) copyHead = n;
+        else copyLast->nxt = n;
+        copyLast = n;
+        orig = orig->nxt;
+    }
+    
+    Stu* curr = copyHead;
+    while (curr) {
+        Stu* minN = curr;
+        Stu* temp = curr->nxt;
+        while (temp) {
+            if (temp->yr < minN->yr || 
+               (temp->yr == minN->yr && temp->id < minN->id)) {
+                minN = temp;
+            }
+            temp = temp->nxt;
+        }
+        if (minN != curr) {
+            swapStu(curr, minN);
+        }
+        curr = curr->nxt;
+    }
+    
+    ofstream out("sorted_by_enrollment.txt");
+    out << "ENROLLMENT YEAR SORTING\n";
+    out << "========================\n\n";
+    
+    int curYr = -1;
+    float sum = 0;
+    int cnt = 0;
+    curr = copyHead;
+    
+    while (curr) {
+        if (curr->yr != curYr) {
+            if (curYr != -1) {
+                out << "Avg CGPA for " << curYr << ": " 
+                    << fixed << setprecision(2) << (sum/cnt) << "\n\n";
+            }
+            curYr = curr->yr;
+            sum = 0;
+            cnt = 0;
+            out << "=== Year " << curYr << " ===\n";
+        }
+        
+        out << curr->id << "  " << curr->name << "  "
+            << curr->dept << "  " << curr->sem << "  "
+            << fixed << setprecision(2) << curr->gpa << "  "
+            << curr->cred << endl;
+        
+        sum += curr->gpa;
+        cnt++;
+        curr = curr->nxt;
+    }
+    
+    if (cnt > 0) {
+        out << "Avg CGPA for " << curYr << ": " 
+            << fixed << setprecision(2) << (sum/cnt) << "\n";
+    }
+    
+    Stu* temp;
+    while (copyHead) {
+        temp = copyHead;
+        copyHead = copyHead->nxt;
+        delete temp;
+    }
+    out.close();
+}
+
+void makeFile3() {
+    Stu* copyHead = nullptr;
+    Stu* copyLast = nullptr;
+    Stu* orig = first;
+    
+    while (orig) {
+        Stu* n = new Stu;
+        *n = *orig;
+        n->nxt = nullptr;
+        
+        if (!copyHead) copyHead = n;
+        else copyLast->nxt = n;
+        copyLast = n;
+        orig = orig->nxt;
+    }
+    
+    Stu* curr = copyHead;
+    while (curr) {
+        Stu* best = curr;
+        Stu* temp = curr->nxt;
+        while (temp) {
+            if (strcmp(temp->dept, best->dept) < 0 ||
+               (strcmp(temp->dept, best->dept) == 0 && temp->sem < best->sem) ||
+               (strcmp(temp->dept, best->dept) == 0 && temp->sem == best->sem && temp->gpa > best->gpa)) {
+                best = temp;
+            }
+            temp = temp->nxt;
+        }
+        if (best != curr) {
+            swapStu(curr, best);
+        }
+        curr = curr->nxt;
+    }
+    
+    ofstream out("department_analysis.txt");
+    out << "DEPARTMENT ANALYSIS\n";
+    out << "===================\n\n";
+    
+    char curDep[4] = "";
+    float sumGpa = 0;
+    int depCnt = 0;
+    float sumCred = 0;
+    float maxG = -1;
+    float minG = 5;
+    curr = copyHead;
+    
+    while (curr) {
+        if (strcmp(curr->dept, curDep) != 0) {
+            if (depCnt > 0) {
+                out << "--- Statistics ---\n";
+                out << "Total Students: " << depCnt << "\n";
+                out << "Average CGPA: " << fixed << setprecision(2) << (sumGpa/depCnt) << "\n";
+                out << "Highest CGPA: " << fixed << setprecision(2) << maxG << "\n";
+                out << "Lowest CGPA: " << fixed << setprecision(2) << minG << "\n";
+                out << "Avg Credits: " << fixed << setprecision(1) << (sumCred/depCnt) << "\n\n";
+            }
+            strcpy(curDep, curr->dept);
+            sumGpa = 0;
+            sumCred = 0;
+            depCnt = 0;
+            maxG = -1;
+            minG = 5;
+            out << "=== Department: " << curDep << " ===\n";
+        }
+        
+        out << curr->id << "  " << curr->name << "  Sem" << curr->sem 
+            << "  GPA:" << fixed << setprecision(2) << curr->gpa 
+            << "  Credits:" << curr->cred << "  Year:" << curr->yr << endl;
+        
+        sumGpa += curr->gpa;
+        sumCred += curr->cred;
+        depCnt++;
+        if (curr->gpa > maxG) maxG = curr->gpa;
+        if (curr->gpa < minG) minG = curr->gpa;
+        
+        curr = curr->nxt;
+    }
+    
+    if (depCnt > 0) {
+        out << "--- Statistics ---\n";
+        out << "Total Students: " << depCnt << "\n";
+        out << "Average CGPA: " << fixed << setprecision(2) << (sumGpa/depCnt) << "\n";
+        out << "Highest CGPA: " << fixed << setprecision(2) << maxG << "\n";
+        out << "Lowest CGPA: " << fixed << setprecision(2) << minG << "\n";
+        out << "Avg Credits: " << fixed << setprecision(1) << (sumCred/depCnt) << "\n";
+    }
+    
+    Stu* temp;
+    while (copyHead) {
+        temp = copyHead;
+        copyHead = copyHead->nxt;
+        delete temp;
+    }
+    out.close();
+}
+
+void insertNameSort(Stu** h, Stu* n) {
+    if (!*h || strcmp(n->name, (*h)->name) < 0) {
+        n->nxt = *h;
+        *h = n;
+    } else {
+        Stu* cur = *h;
+        while (cur->nxt && strcmp(n->name, cur->nxt->name) > 0) {
+            cur = cur->nxt;
+        }
+        n->nxt = cur->nxt;
+        cur->nxt = n;
+    }
+}
+
+void makeFile4() {
+    Stu* elite = nullptr;
+    Stu* high = nullptr;
+    Stu* good = nullptr;
+    Stu* sat = nullptr;
+    Stu* need = nullptr;
+    
+    int e = 0, h = 0, g = 0, s = 0, n = 0;
+    
+    Stu* curr = first;
+    while (curr) {
+        Stu* newNode = new Stu;
+        *newNode = *curr;
+        newNode->nxt = nullptr;
+        
+        if (curr->gpa >= 3.70) {
+            insertNameSort(&elite, newNode);
+            e++;
+        } else if (curr->gpa >= 3.30) {
+            insertNameSort(&high, newNode);
+            h++;
+        } else if (curr->gpa >= 3.00) {
+            insertNameSort(&good, newNode);
+            g++;
+        } else if (curr->gpa >= 2.50) {
+            insertNameSort(&sat, newNode);
+            s++;
+        } else {
+            insertNameSort(&need, newNode);
+            n++;
+        }
+        curr = curr->nxt;
+    }
+    
+    ofstream out("performance_tiers.txt");
+    out << "PERFORMANCE TIERS\n";
+    out << "=================\n\n";
+    
+    out << "*** ELITE TIER (CGPA >= 3.70) ***\n";
+    out << "Count: " << e << " (" 
+        << fixed << setprecision(1) << (e*100.0/total) << "%)\n";
+    curr = elite;
+    while (curr) {
+        out << curr->name << " [" << curr->id << "] " << curr->dept 
+            << " Sem" << curr->sem << " GPA:" << fixed << setprecision(2) << curr->gpa << endl;
+        curr = curr->nxt;
+    }
+    out << endl;
+    
+    out << "*** HIGH ACHIEVERS (3.30 <= CGPA < 3.70) ***\n";
+    out << "Count: " << h << " (" 
+        << fixed << setprecision(1) << (h*100.0/total) << "%)\n";
+    curr = high;
+    while (curr) {
+        out << curr->name << " [" << curr->id << "] " << curr->dept 
+            << " Sem" << curr->sem << " GPA:" << fixed << setprecision(2) << curr->gpa << endl;
+        curr = curr->nxt;
+    }
+    out << endl;
+    
+    out << "*** GOOD STANDING (3.00 <= CGPA < 3.30) ***\n";
+    out << "Count: " << g << " (" 
+        << fixed << setprecision(1) << (g*100.0/total) << "%)\n";
+    curr = good;
+    while (curr) {
+        out << curr->name << " [" << curr->id << "] " << curr->dept 
+            << " Sem" << curr->sem << " GPA:" << fixed << setprecision(2) << curr->gpa << endl;
+        curr = curr->nxt;
+    }
+    out << endl;
+    
+    out << "*** SATISFACTORY (2.50 <= CGPA < 3.00) ***\n";
+    out << "Count: " << s << " (" 
+        << fixed << setprecision(1) << (s*100.0/total) << "%)\n";
+    curr = sat;
+    while (curr) {
+        out << curr->name << " [" << curr->id << "] " << curr->dept 
+            << " Sem" << curr->sem << " GPA:" << fixed << setprecision(2) << curr->gpa << endl;
+        curr = curr->nxt;
+    }
+    out << endl;
+    
+    out << "*** NEEDS IMPROVEMENT (CGPA < 2.50) ***\n";
+    out << "Count: " << n << " (" 
+        << fixed << setprecision(1) << (n*100.0/total) << "%)\n";
+    curr = need;
+    while (curr) {
+        out << curr->name << " [" << curr->id << "] " << curr->dept 
+            << " Sem" << curr->sem << " GPA:" << fixed << setprecision(2) << curr->gpa << endl;
+        curr = curr->nxt;
+    }
+    
+    Stu* temp;
+    while (elite) {
+        temp = elite;
+        elite = elite->nxt;
+        delete temp;
+    }
+    while (high) {
+        temp = high;
+        high = high->nxt;
+        delete temp;
+    }
+    while (good) {
+        temp = good;
+        good = good->nxt;
+        delete temp;
+    }
+    while (sat) {
+        temp = sat;
+        sat = sat->nxt;
+        delete temp;
+    }
+    while (need) {
+        temp = need;
+        need = need->nxt;
+        delete temp;
+    }
+    
+    out.close();
+}
+
+void freeAll() {
+    Stu* curr = first;
+    while (curr) {
+        Stu* t = curr;
+        curr = curr->nxt;
+        delete t;
+    }
+    first = nullptr;
 }
 
 int main() {
-    srand(time(0));
-
-    ofstream outFile("students_data.txt");
-
-    if (!outFile) {
-        cout << "Error creating file!" << endl;
+    load();
+    if (total == 0) {
+        cout << "No data\n";
         return 1;
     }
-
-    const int TOTAL_STUDENTS = 1000000;
-
-    cout << "Generating 1,000,000 student records..." << endl;
-    cout << "This may take a few minutes. Please wait..." << endl;
-
-    // Write total count
-    outFile << TOTAL_STUDENTS << endl;
-
-    int maleNameSize = sizeof(firstNamesMale) / sizeof(firstNamesMale[0]);
-    int femaleNameSize = sizeof(firstNamesFemale) / sizeof(firstNamesFemale[0]);
-    int lastNameSize = sizeof(lastNames) / sizeof(lastNames[0]);
-    int deptSize = sizeof(departments) / sizeof(departments[0]);
-
-    // Generate records
-    for (int i = 0; i < TOTAL_STUDENTS; i++) {
-        // Generate unique Student ID (6 digits starting from 200001)
-        int studentID = 200001 + i;
-
-        // Generate random name (50% male, 50% female)
-        string firstName;
-        if (rand() % 2 == 0) {
-            firstName = firstNamesMale[rand() % maleNameSize];
-        }
-        else {
-            firstName = firstNamesFemale[rand() % femaleNameSize];
-        }
-
-        string lastName = lastNames[rand() % lastNameSize];
-        string fullName = firstName + " " + lastName;
-
-        // Generate random department
-        string dept = departments[rand() % deptSize];
-
-        // Generate random semester (1-8)
-        int semester = (rand() % 8) + 1;
-
-        // Generate CGPA
-        double cgpa = generateCGPA();
-
-        // Generate credit hours based on semester
-        int creditHours = generateCreditHours(semester);
-
-        // Generate enrollment year (2015-2023)
-        int enrollmentYear = 2015 + (rand() % 9);
-
-        // Write to file
-        outFile << studentID << " "
-            << fullName << " "
-            << dept << " "
-            << semester << " "
-            << fixed << setprecision(2) << cgpa << " "
-            << creditHours << " "
-            << enrollmentYear << endl;
-
-        // Progress indicator
-        if ((i + 1) % 100000 == 0) {
-            cout << "Generated " << (i + 1) << " records..." << endl;
-        }
-    }
-
-    outFile.close();
-
-    cout << "\n==================================================" << endl;
-    cout << "SUCCESS! File 'students_data.txt' created!" << endl;
-    cout << "Total records: " << TOTAL_STUDENTS << endl;
-    cout << "==================================================" << endl;
-
-    // Display file statistics
-    cout << "\nFile Statistics:" << endl;
-    cout << "- Student IDs: 200001 to " << (200000 + TOTAL_STUDENTS) << endl;
-    cout << "- Departments: 10 different departments" << endl;
-    cout << "- Semesters: 1 to 8" << endl;
-    cout << "- CGPA Range: 2.00 to 4.00" << endl;
-    cout << "- Enrollment Years: 2015 to 2023" << endl;
-    cout << "\nYou can now use this file with your linked list program!" << endl;
-
+    
+    makeFile1();
+    makeFile2();
+    makeFile3();
+    makeFile4();
+    
+    freeAll();
+    
+    cout << "Files done\n";
     return 0;
 }
